@@ -8,40 +8,66 @@ const FLAKES = Array.from({ length: 18 }, (_, i) => ({
   id: i, x: Math.random() * 100, delay: Math.random() * 6, dur: Math.random() * 4 + 4, size: Math.random() * 10 + 8,
 }));
 
+// ─── Fallbacks ────────────────────────────────────────────────────────────────
 const CHAT_FALLBACKS: Record<string, Record<string, string[]>> = {
   it: {
     young: [
-      "Ciao piccolo! 🧙‍♀️ Sono la Befana! Sei stato bravo quest'anno? 🌟",
-      "Che bello vederti! ❄️ Dimmi, hai aiutato la mamma e il papà? 🧹",
-      "Hmm... il mio calzino è quasi pronto! 🧦 Hai dormito bene tutte le notti? 😴",
-      "Sei davvero un bambino speciale! ✨ Cosa ti piace fare di più?",
+      "Ciao! 🧙‍♀️ Sono la Befana! Dimmi la verità: hai fatto qualcosa di cui sei orgoglioso quest'anno? 🌟",
+      "Brave le persone oneste! ❄️ Dimmi sinceramente: c'è qualcosa che avresti fatto diversamente? 🧹",
+      "La Befana ama chi è onesto! 🧦 Hai mai detto una bugia? Puoi dirmelo, non ti giudico! 😊",
+      "Sei speciale perché sei sincero! ✨ Cosa hai imparato di nuovo quest'anno?",
     ],
     older: [
-      "Buonasera! Sono la Befana, arrivata su questa scopa magica! 🧹✨ Come ti sei comportato quest'anno?",
-      "Ho volato su tanti tetti stanotte! 🌟 Sei tra i bambini buoni? Cosa hai fatto di bello?",
-      "Il mio sacco è pieno... ma di dolci o carbone? 😏 Dimmi qualcosa di te!",
-      "Interessante! ✨ E a scuola, sei stato bravo? Hai aiutato i tuoi compagni?",
+      "Buonasera! 🧹✨ Sapevi che la Befana porta dolci ai bambini che danno risposte oneste? Pronti per una domanda?",
+      "Eccomi! 🌟 Ho una domanda per te: secondo la leggenda, cosa porta la Befana ai bambini monelli?",
+      "Bene! 😏 Altra domanda: in quale notte vola la Befana sui tetti d'Italia?",
+      "Quasi finito! ✨ Ultima domanda: da dove entra la Befana nelle case?",
     ],
   },
   nl: {
     young: [
-      "Hallo lief kind! 🧙‍♀️ Ik ben de Befana! Ben jij dit jaar lief geweest? 🌟",
-      "Wat fijn om je te zien! ❄️ Heb jij geholpen thuis en netjes gegeten? 🧹",
-      "Hmm... jouw sok is bijna klaar! 🧦 Heb je altijd goed geslapen? 😴",
-      "Jij bent een heel bijzonder kind! ✨ Wat doe jij het allerliefst?",
+      "Hallo! 🧙‍♀️ Ik ben de Befana! Vertel me eerlijk: heb jij dit jaar iets gedaan waar je trots op bent? 🌟",
+      "Eerlijke mensen zijn de liefste! ❄️ Vertel me oprecht: is er iets dat je anders had willen doen? 🧹",
+      "De Befana houdt van eerlijkheid! 🧦 Heb je wel eens een leugentje verteld? Dat mag je zeggen, ik oordeel niet! 😊",
+      "Jij bent bijzonder omdat je eerlijk bent! ✨ Wat heb je dit jaar nieuws geleerd?",
     ],
     older: [
-      "Goedenavond! Ik ben de Befana, net geland op mijn magische bezem! 🧹✨ Hoe heb jij je dit jaar gedragen?",
-      "Ik heb zoveel daken bezocht vannacht! 🌟 Hoor jij bij de lieve kinderen? Wat heb je goed gedaan?",
-      "Mijn zak zit vol... maar met snoep of kolen? 😏 Vertel me iets over jezelf!",
-      "Interessant! ✨ En op school — heb je je best gedaan en vrienden geholpen?",
+      "Goedenavond! 🧹✨ Wist je dat de Befana snoep brengt aan kinderen die de goede antwoorden weten? Klaar voor een vraag?",
+      "Daar ben ik! 🌟 Eerste vraag: wat brengt de Befana volgens de legende aan stoute kinderen?",
+      "Goed! 😏 Volgende vraag: in welke nacht vliegt de Befana over de daken van Italië?",
+      "Bijna klaar! ✨ Laatste vraag: hoe komt de Befana de huizen binnen?",
     ],
   },
 };
 
-const SOCK_FALLBACK: Record<string, string> = {
-  it: "Sei stato/a davvero bravo/a! 🍬 La Befana mette tanti dolci nel tuo calzino! Buona Epifania! 🌟",
-  nl: "Jij was echt heel lief dit jaar! 🍬 De Befana stopt veel snoepjes in jouw sok! Fijne Driekoningen! 🌟",
+// ─── Quiz answers (for older children) ───────────────────────────────────────
+const QUIZ_ANSWERS: Record<string, string[][]> = {
+  it: [
+    ["carbone", "carbone nero", "il carbone", "coal"],
+    ["5 gennaio", "notte del 5", "5 e 6 gennaio", "tra il 5 e il 6", "epifania"],
+    ["camino", "dal camino", "per il camino", "caminetto"],
+  ],
+  nl: [
+    ["kolen", "steenkool", "coal", "zwarte kolen"],
+    ["5 januari", "nacht van 5", "5 op 6 januari", "driekoningen", "epifania"],
+    ["schoorsteen", "door de schoorsteen", "via de schoorsteen"],
+  ],
+};
+
+const SOCK_FALLBACK: Record<string, Record<string, string>> = {
+  it: {
+    young: "Che risposta onesta e coraggiosa! 🌟 La Befana ama chi dice la verità — il tuo calzino è pieno di dolci! 🍬✨",
+    older: "Bravissimo/a! 🎉 Conosci bene la storia della Befana — il tuo calzino è pieno di dolci! 🍬🌟",
+  },
+  nl: {
+    young: "Wat een eerlijk en dapper antwoord! 🌟 De Befana houdt van mensen die de waarheid spreken — jouw sok zit vol snoep! 🍬✨",
+    older: "Heel goed! 🎉 Jij kent het verhaal van de Befana goed — jouw sok zit vol snoep! 🍬🌟",
+  },
+};
+
+const SOCK_FALLBACK_COAL: Record<string, string> = {
+  it: "Hmm, non proprio! 😄 Ma la Befana è di buon umore stasera — nel calzino ci sono solo dolci! La prossima volta studia la mia storia! 🍬",
+  nl: "Hmm, niet helemaal goed! 😄 Maar de Befana is vanavond goedgehumeurd — in de sok zit toch snoep! Bestudeer mijn verhaal voor de volgende keer! 🍬",
 };
 
 const STORIES: Record<string, Record<string, { emoji: string; text: string }[]>> = {
@@ -97,20 +123,22 @@ const UI: Record<string, any> = {
     flySub: "Sulla sua scopa magica, attraverso le stelle...",
     flyWait: "La Befana sta volando...",
     mirrorTitle: "Lo Specchio Magico",
-    mirrorSub: "La Befana ti guarda...",
+    mirrorSubYoung: "Rispondi con il cuore... 💛",
+    mirrorSubOlder: "Quante domande sai rispondere? 🧠",
     mirrorBtn: "Parla con la Befana 🪞",
-    sendBtn: "Invia", placeholder: "Rispondi alla Befana...",
+    sendBtn: "Invia", placeholder: "Scrivi qui...",
     typing: "La Befana sta pensando... ✨",
     sockBtn: "🧦 Apri il calzino!",
     sockTitle: "Il tuo calzino...",
-    sockSub: "La Befana ha scelto!",
+    sockSub: "La Befana ha deciso!",
     sockWait: "La Befana sta guardando nel calzino...",
     apiLabel: "🔑 Chiave API Gemini",
     apiHelp: "Ottieni la tua chiave gratuita su",
     apiStep: '→ "Get API key" → "Create API key"',
     apiSave: "Salva ✨", apiPrivacy: "🔒 Salvata solo nel browser",
     apiLink: "Per i genitori: chiave API",
-    sockHint: "Rispondi ancora un po' alla Befana prima di aprire il calzino! 🧙‍♀️",
+    sockHintYoung: "Rispondi ancora un po'... la Befana ti sta ascoltando! 💛",
+    sockHintOlder: "Ancora qualche domanda prima di aprire il calzino! 🧠",
   },
   nl: {
     subtitle: "De Magie van Driekoningen",
@@ -125,23 +153,26 @@ const UI: Record<string, any> = {
     flySub: "Op haar magische bezem, door de sterren...",
     flyWait: "De Befana vliegt...",
     mirrorTitle: "De Magische Spiegel",
-    mirrorSub: "De Befana kijkt naar je...",
+    mirrorSubYoung: "Antwoord met je hart... 💛",
+    mirrorSubOlder: "Hoeveel vragen kun jij beantwoorden? 🧠",
     mirrorBtn: "Praat met de Befana 🪞",
-    sendBtn: "Stuur", placeholder: "Antwoord de Befana...",
+    sendBtn: "Stuur", placeholder: "Typ hier...",
     typing: "De Befana denkt na... ✨",
     sockBtn: "🧦 Open de sok!",
     sockTitle: "Jouw sok...",
-    sockSub: "De Befana heeft gekozen!",
+    sockSub: "De Befana heeft besloten!",
     sockWait: "De Befana kijkt in de sok...",
     apiLabel: "🔑 Gemini API-sleutel",
     apiHelp: "Haal je gratis sleutel op via",
     apiStep: '→ "Get API key" → "Create API key"',
     apiSave: "Opslaan ✨", apiPrivacy: "🔒 Alleen lokaal opgeslagen",
     apiLink: "Voor ouders: API-sleutel",
-    sockHint: "Praat nog even wat meer met de Befana! 🧙‍♀️",
+    sockHintYoung: "Vertel nog wat meer... de Befana luistert! 💛",
+    sockHintOlder: "Nog een paar vragen voor de sok opengaat! 🧠",
   },
 };
 
+// ─── Gemini ───────────────────────────────────────────────────────────────────
 const GEMINI_MODEL = "gemini-2.0-flash";
 type GTurn = { role: string; parts: { text: string }[] };
 
@@ -161,19 +192,44 @@ const callGemini = async (apiKey: string, text: string, history: GTurn[] = []): 
   return out;
 };
 
-const buildSys = (lang: string, age: string) =>
-  `You are the Befana — a kind, mysterious old witch who visits on January 5th to fill children's stockings.
-Respond ONLY in ${lang === "it" ? "Italian" : "Dutch"}.
-${age === "young"
-    ? "Age 4-6: very simple words, short sentences, warm playful tone, many emojis."
-    : "Age 7-10: slightly richer language, warm and magical, max 4 sentences."}
-Never break character. Always end with a question or magical hint about the stocking (calzino/sok).`;
+// ─── System prompts ───────────────────────────────────────────────────────────
 
-const buildSockPrompt = (lang: string, age: string, convo: string) =>
-  `Based on this conversation decide if the child gets dolci (sweets) or carbone (coal).
+const buildSysYoung = (lang: string) =>
+  `You are the Befana — a warm, kind old witch. You talk to children aged 4-6.
+Respond ONLY in ${lang === "it" ? "Italian" : "Dutch"}.
+Your approach: you reward HONESTY, not good behaviour. Ask the child simple heartfelt questions (did they help someone, did they ever make a mistake, what are they proud of). 
+When they answer honestly — even if they admit something naughty — always respond warmly and say the Befana loves honest children above all. Never judge. Always end with encouragement.
+Keep responses very short: max 2-3 sentences, simple words, warm emojis. Never break character.`;
+
+const buildSysOlder = (lang: string) =>
+  `You are the Befana — a mysterious, playful old witch. You talk to children aged 7-10.
+Respond ONLY in ${lang === "it" ? "Italian" : "Dutch"}.
+Your approach: ask the child fun quiz questions about the Befana legend (what she brings to naughty children, which night she flies, how she enters houses, where the tradition comes from).
+For each answer: react playfully. If correct → celebrate warmly. If wrong → tease gently and give a hint, never make them feel bad.
+Keep responses short: max 3 sentences, playful tone, emojis. Never break character.`;
+
+// ─── Sock evaluation ──────────────────────────────────────────────────────────
+
+const buildSockPromptYoung = (lang: string, convo: string) =>
+  `You are evaluating a conversation between the Befana and a young child (4-6 years old).
+The Befana rewards HONESTY, not good behaviour. If the child answered at all — even admitting something naughty — that counts as honest and deserves sweets.
 Conversation:\n${convo}
 Return ONLY valid JSON:
-{"result":"dolci or carbone","message":"warm closing message in ${lang === "it" ? "Italian" : "Dutch"} from Befana, max 2 sentences, with emojis, ${age === "young" ? "very simple" : "slightly elaborate"}"}`;
+{"result":"dolci","message":"very warm, simple closing message in ${lang === "it" ? "Italian" : "Dutch"} from Befana praising the child's honesty, max 2 sentences, emojis, simple words"}`;
+
+const buildSockPromptOlder = (lang: string, convo: string) =>
+  `You are evaluating a quiz conversation between the Befana and a child (7-10 years old) about Befana trivia.
+Count how many answers were roughly correct. If more than half correct → dolci. If mostly wrong → carbone (but keep it playful and funny, not mean — even coal comes with a laugh).
+Conversation:\n${convo}
+Return ONLY valid JSON:
+{"result":"dolci or carbone","message":"playful closing message in ${lang === "it" ? "Italian" : "Dutch"} from Befana, max 2 sentences, emojis. If carbone: make it funny not sad, say she'll bring sweets next year if they study her story"}`;
+
+// ─── Local quiz checker (fallback for older, no API) ─────────────────────────
+const checkQuizAnswer = (lang: string, questionIdx: number, answer: string): boolean => {
+  if (questionIdx < 0 || questionIdx >= QUIZ_ANSWERS[lang].length) return true;
+  const ans = answer.toLowerCase().trim();
+  return QUIZ_ANSWERS[lang][questionIdx].some(correct => ans.includes(correct));
+};
 
 type Screen = "lang" | "age" | "home" | "story" | "fly" | "mirror" | "sock";
 type Msg = { from: "befana" | "child"; text: string };
@@ -194,6 +250,9 @@ export default function App() {
   const [chatInput, setChatInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [childMsgCount, setChildMsgCount] = useState(0);
+  // For older quiz: track correct answers locally
+  const [quizCorrect, setQuizCorrect] = useState(0);
+  const [quizTotal, setQuizTotal] = useState(0);
   const [sockResult, setSockResult] = useState<{ result: string; message: string } | null>(null);
   const [sockLoading, setSockLoading] = useState(false);
 
@@ -242,13 +301,18 @@ export default function App() {
     setHistory([]);
     setFbIdx(0);
     setChildMsgCount(0);
+    setQuizCorrect(0);
+    setQuizTotal(0);
     setLoading(true);
-    const sys = buildSys(lang, age);
-    const opener = lang === "it" ? "Ciao! Sono pronto!" : "Hallo! Ik ben er klaar voor!";
+
+    const sys = age === "young" ? buildSysYoung(lang) : buildSysOlder(lang);
+    const opener = lang === "it" ? "Ciao Befana! Sono pronto!" : "Hallo Befana! Ik ben er klaar voor!";
     const prompt = `${sys}\n\nKind zegt: ${opener}`;
+
     let reply = "";
     try { if (apiKey) reply = await callGemini(apiKey, prompt); } catch { reply = ""; }
     if (!reply) reply = getFallback();
+
     const h: GTurn[] = [
       { role: "user", parts: [{ text: prompt }] },
       { role: "model", parts: [{ text: reply }] },
@@ -264,11 +328,22 @@ export default function App() {
     setChatInput("");
     const newMsgs: Msg[] = [...msgs, { from: "child", text: txt }];
     setMsgs(newMsgs);
-    setChildMsgCount(c => c + 1);
+    const newCount = childMsgCount + 1;
+    setChildMsgCount(newCount);
     setLoading(true);
+
+    // For older: track quiz answers locally as fallback
+    if (age === "older") {
+      const qIdx = childMsgCount; // which question this is answering
+      const correct = checkQuizAnswer(lang, qIdx, txt);
+      if (correct) setQuizCorrect(c => c + 1);
+      setQuizTotal(t => t + 1);
+    }
+
     let reply = "";
     try { if (apiKey) reply = await callGemini(apiKey, txt, history); } catch { reply = ""; }
     if (!reply) reply = getFallback();
+
     const newH: GTurn[] = [
       ...history,
       { role: "user", parts: [{ text: txt }] },
@@ -284,14 +359,35 @@ export default function App() {
     setSockLoading(true);
     setScreen("sock");
     const convo = msgs.map(m => `${m.from === "befana" ? "Befana" : "Kind"}: ${m.text}`).join("\n");
+
     let result: { result: string; message: string } | null = null;
     try {
       if (apiKey) {
-        const raw = await callGemini(apiKey, buildSockPrompt(lang, age, convo), []);
+        const prompt = age === "young"
+          ? buildSockPromptYoung(lang, convo)
+          : buildSockPromptOlder(lang, convo);
+        const raw = await callGemini(apiKey, prompt, []);
         result = JSON.parse(raw.replace(/```json|```/g, "").trim());
       }
     } catch { result = null; }
-    if (!result) result = { result: "dolci", message: SOCK_FALLBACK[lang] };
+
+    if (!result) {
+      // Fallback logic
+      if (age === "young") {
+        // Always dolci for young — honesty always rewarded
+        result = { result: "dolci", message: SOCK_FALLBACK[lang].young };
+      } else {
+        // Older: check local quiz score
+        const majority = quizTotal > 0 && quizCorrect >= Math.ceil(quizTotal / 2);
+        result = majority
+          ? { result: "dolci", message: SOCK_FALLBACK[lang].older }
+          : { result: "carbone", message: SOCK_FALLBACK_COAL[lang] };
+      }
+    }
+
+    // Safety net: young children ALWAYS get dolci
+    if (age === "young") result.result = "dolci";
+
     setSockResult(result);
     setSockLoading(false);
   };
@@ -300,11 +396,14 @@ export default function App() {
     setMsgs([]);
     setHistory([]);
     setChildMsgCount(0);
+    setQuizCorrect(0);
+    setQuizTotal(0);
     setSockResult(null);
     setFbIdx(0);
     setChatInput("");
   };
 
+  // ─── CSS ──────────────────────────────────────────────────────────────────────
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
     *{box-sizing:border-box;margin:0;padding:0}
@@ -368,9 +467,7 @@ export default function App() {
         <p style={{ fontSize:"1rem", color:"rgba(220,190,255,.9)", marginBottom:10 }}>{T.apiLabel}</p>
         <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(200,150,255,.14)", borderRadius:11, padding:"11px 15px", marginBottom:14, fontSize:".82rem", lineHeight:1.75, color:"rgba(200,170,255,.85)" }}>
           {T.apiHelp}{" "}
-          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
-            aistudio.google.com
-          </a>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a>
           <br />{T.apiStep}
         </div>
         <input className="ifield" type="password" placeholder="AIza..." value={apiInput}
@@ -389,8 +486,7 @@ export default function App() {
   // ── LANG ──
   if (screen === "lang") return (
     <div style={wrap}>
-      <style>{css}</style>
-      <Bg />
+      <style>{css}</style><Bg />
       <div style={{ textAlign:"center", maxWidth:460, width:"100%", position:"relative", zIndex:1 }}>
         <div style={{ fontSize:"5.5rem", marginBottom:10, filter:"drop-shadow(0 0 24px rgba(255,180,50,.9))" }}>🧙‍♀️</div>
         <h1 style={{ fontFamily:"'Cinzel Decorative',serif", fontSize:"2.3rem", marginBottom:6, lineHeight:1.2 }} className="glow">BEFANA</h1>
@@ -417,9 +513,7 @@ export default function App() {
   // ── AGE ──
   if (screen === "age") return (
     <div style={wrap}>
-      <style>{css}</style>
-      <Bg />
-      <HomeBtn />
+      <style>{css}</style><Bg /><HomeBtn />
       <div style={{ textAlign:"center", maxWidth:440, width:"100%", position:"relative", zIndex:1 }}>
         <div style={{ fontSize:"3.5rem", marginBottom:14 }}>🧹</div>
         <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontSize:"1.55rem", marginBottom:28 }} className="glow">{T.ageTitle}</h2>
@@ -436,14 +530,15 @@ export default function App() {
   // ── HOME ──
   if (screen === "home") {
     const menuItems = [
-      { key:"story",  label: T.menuStory,  desc: lang==="it" ? "Scopri come è nata la Befana"              : "Ontdek hoe de Befana is ontstaan" },
-      { key:"fly",    label: T.menuFly,    desc: lang==="it" ? "Guardala volare nel cielo stellato!"        : "Zie haar vliegen door de sterrenhemel!" },
-      { key:"mirror", label: T.menuMirror, desc: lang==="it" ? "Parla con la Befana nel suo specchio magico" : "Praat met de Befana in haar magische spiegel" },
+      { key:"story",  label: T.menuStory,  desc: lang==="it" ? "Scopri come è nata la Befana"               : "Ontdek hoe de Befana is ontstaan" },
+      { key:"fly",    label: T.menuFly,    desc: lang==="it" ? "Guardala volare nel cielo stellato!"         : "Zie haar vliegen door de sterrenhemel!" },
+      { key:"mirror", label: T.menuMirror, desc: lang==="it"
+          ? (age==="young" ? "Rispondi con il cuore e vinci i dolci! 💛" : "Rispondi alle domande sulla Befana! 🧠")
+          : (age==="young" ? "Antwoord eerlijk en win snoep! 💛"          : "Beantwoord vragen over de Befana! 🧠") },
     ];
     return (
       <div style={wrap}>
-        <style>{css}</style>
-        <Bg />
+        <style>{css}</style><Bg />
         <div style={{ maxWidth:460, width:"100%", position:"relative", zIndex:1 }}>
           <div style={{ textAlign:"center", marginBottom:28 }}>
             <div style={{ fontSize:"4rem", marginBottom:8, filter:"drop-shadow(0 0 18px rgba(255,180,50,.8))" }}>🧙‍♀️</div>
@@ -482,9 +577,7 @@ export default function App() {
     const slides = STORIES[lang][age];
     return (
       <div style={wrap}>
-        <style>{css}</style>
-        <Bg />
-        <HomeBtn />
+        <style>{css}</style><Bg /><HomeBtn />
         <div style={{ textAlign:"center", maxWidth:510, width:"100%", position:"relative", zIndex:1 }}>
           <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontSize:"1.3rem", marginBottom:20 }} className="glow">{T.storyTitle}</h2>
           <div className="card" style={{ padding:34, minHeight:210 }}>
@@ -510,9 +603,7 @@ export default function App() {
   // ── FLY ──
   if (screen === "fly") return (
     <div style={wrap}>
-      <style>{css}</style>
-      <Bg />
-      <HomeBtn />
+      <style>{css}</style><Bg /><HomeBtn />
       <div className="bfly" style={{ left:`${befanaX}%` }}>🧙‍♀️</div>
       <div style={{ textAlign:"center", maxWidth:500, width:"100%", position:"relative", zIndex:1, marginTop:60 }}>
         <div style={{ fontSize:"3.5rem", marginBottom:16 }}>🌟</div>
@@ -540,14 +631,14 @@ export default function App() {
   // ── MIRROR ──
   if (screen === "mirror") return (
     <div style={wrap}>
-      <style>{css}</style>
-      <Bg />
-      <HomeBtn />
+      <style>{css}</style><Bg /><HomeBtn />
       <div style={{ maxWidth:510, width:"100%", position:"relative", zIndex:1 }}>
         <div style={{ textAlign:"center", marginBottom:16 }}>
           <div style={{ width:90, height:110, background:"radial-gradient(ellipse,rgba(100,20,150,.82),rgba(40,0,80,.96))", borderRadius:"50%", margin:"0 auto 10px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3.2rem", boxShadow:"0 0 28px rgba(150,80,255,.5),0 0 55px rgba(80,20,150,.3)", border:"4px solid rgba(200,150,255,.3)" }}>🧙‍♀️</div>
           <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontSize:"1.25rem" }} className="glow">{T.mirrorTitle}</h2>
-          <p style={{ fontStyle:"italic", color:"rgba(200,170,255,.55)", fontSize:".82rem" }}>{T.mirrorSub}</p>
+          <p style={{ fontStyle:"italic", color:"rgba(200,170,255,.55)", fontSize:".82rem" }}>
+            {age === "young" ? T.mirrorSubYoung : T.mirrorSubOlder}
+          </p>
         </div>
         <div className="card" style={{ padding:18, maxHeight:"40vh", overflowY:"auto", marginBottom:14 }}>
           {msgs.map((m, i) => (
@@ -580,7 +671,9 @@ export default function App() {
           </div>
         ) : (
           childMsgCount > 0 && (
-            <p style={{ textAlign:"center", fontSize:".78rem", color:"rgba(200,150,255,.45)", fontStyle:"italic" }}>{T.sockHint}</p>
+            <p style={{ textAlign:"center", fontSize:".78rem", color:"rgba(200,150,255,.45)", fontStyle:"italic" }}>
+              {age === "young" ? T.sockHintYoung : T.sockHintOlder}
+            </p>
           )
         )}
       </div>
@@ -590,9 +683,7 @@ export default function App() {
   // ── SOCK ──
   if (screen === "sock") return (
     <div style={wrap}>
-      <style>{css}</style>
-      <Bg />
-      <HomeBtn />
+      <style>{css}</style><Bg /><HomeBtn />
       <div style={{ textAlign:"center", maxWidth:460, width:"100%", position:"relative", zIndex:1 }}>
         <h2 style={{ fontFamily:"'Cinzel Decorative',serif", fontSize:"1.35rem", marginBottom:7 }} className="glow">{T.sockTitle}</h2>
         <p style={{ fontStyle:"italic", color:"rgba(200,170,255,.6)", marginBottom:28, fontSize:".88rem" }}>{T.sockSub}</p>
@@ -605,7 +696,7 @@ export default function App() {
           <div className="card" style={{ padding:36 }}>
             <div className="sockrev" style={{ fontSize:"4.8rem", marginBottom:14 }}>🧦</div>
             <div className="cfall" style={{ fontSize:sockResult.result==="dolci" ? "2.8rem" : "2.4rem", marginBottom:18 }}>
-              {sockResult.result === "dolci" ? "🍬🍭🍫🎁✨" : "⬛🪨😅"}
+              {sockResult.result === "dolci" ? "🍬🍭🍫🎁✨" : "⬛🪨😄"}
             </div>
             <div style={{ background:sockResult.result==="dolci" ? "rgba(100,200,100,.1)" : "rgba(120,120,120,.14)", borderRadius:12, padding:18, marginBottom:24, border:`1px solid ${sockResult.result==="dolci" ? "rgba(100,255,100,.2)" : "rgba(160,160,160,.2)"}` }}>
               <p style={{ fontFamily:"'Lora',serif", fontSize:"1.1rem", lineHeight:1.72, fontStyle:"italic" }}>{sockResult.message}</p>
